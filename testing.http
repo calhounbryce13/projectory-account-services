@@ -1,0 +1,66 @@
+
+
+###
+GET http://127.0.0.1:3000/testing
+###
+
+POST http://127.0.0.1:3000/registration
+Content-Type: application/json
+
+{
+    "userEmail": "calhounbryce13@gmail.com",
+    "userPassword":"Jarvis123"
+}
+
+###
+
+POST http://127.0.0.1:3000/login
+Content-Type: application/json
+
+{
+    "userEmail": "calhounbryce13@gmail.com",
+    "userPassword": "Jarvis123"
+}
+
+###
+
+
+POST http://127.0.0.1:3000/current-projects
+
+connect.sid=s%3AbwW9whTpWMWf22RtH2yxh4DI-x2QxUk6.9xgy5JmpG0JYU4rF%2BUFbNtnHFr5sF3th4SoeDJw7Cb8
+
+
+###
+
+POST http://127.0.0.1:3000/current-projects-generator
+Content-Type: application/json
+Cookie: connect.sid=s%3Av9XQkh6vWukJJlKy4LrDOW9U7WTj1A4H.3ZwQRGSRajF3IfuCGglgchrDZ4DqvZpH%2FHDaW5JSKpU
+
+{
+    "title":"to you, from me again",
+    "goal":"something something something lightside",
+    "tasks": ["step 1", "step 2", "step 3", "step 4"]
+}
+
+###
+
+
+POST http://127.0.0.1:3000/logout
+
+connect.sid=s%3AjVBJU2uRHXAE-TRa_05nfOrY38Rc_wnR.Rxj%2Fo%2Bd8HD%2F5cAeQfaUkiJ4GrU44wAdvgioVDu12ezU
+
+###
+
+POST http://127.0.0.1:3000/view-projects
+Content-Type: application/json
+Cookie: connect.sid=s%3Am7B3AG3Qmt4H41DaHub-Iw_soL9ZNyqo.pfq9aHoAKs9P%2FtmQHKdSB4gHGALgzO7usQHlYEtE5oY
+
+{
+    "project-type": "planned"
+}
+
+
+###
+
+GET http://127.0.0.1:3000/get-user-email
+Cookie: connect.sid=s%3AGFlI8yp2Ca4eOJPdADdfHj3kSgNM8plh.vKcYBgqblLh5tVD6E%2FAuOXg0x%2FYVCTRlld7mxOPoIfY; Path=/; HttpOnly
