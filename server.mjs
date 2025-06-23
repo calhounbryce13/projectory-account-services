@@ -36,7 +36,7 @@ app.use(session({
 }));
 app.use(cors({
     //! update for deployment
-    origin: "http://127.0.0.1:5500",
+    origin: "https://calhounbryce13.github.io/projectory/",
     methods: ['GET', 'POST'],
     credentials: true
 }))
