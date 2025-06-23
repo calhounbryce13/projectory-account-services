@@ -30,8 +30,8 @@ app.use(session({
     resave: false,
     cookie: {
         httpOnly: true,
-        secure: false,    
-        sameSite: 'lax'
+        secure: true,    
+        sameSite: 'None'
     }
 }));
 app.use(cors({
