@@ -15,7 +15,7 @@ import nodemailer from 'nodemailer';
 import User from './model.mjs';
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 const rounds = 10;
 
 
