@@ -21,7 +21,7 @@ const rounds = 10;
 
 
 /******************************** MIDDLEWARE ********************************************************************/
-
+app.set('trust proxy', 1); 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 app.use(cors({
@@ -33,10 +33,11 @@ app.use(session({
     secret: "something something darkside",
     saveUninitialized: false,
     resave: false,
+    proxy: true,
     cookie: {
         httpOnly: true,
         secure: true,    
-        sameSite: 'None'
+        sameSite: 'none'
     }
 }));
 
@@ -66,7 +67,7 @@ app.get('/login-status', (req, res)=>{
         }
     }
     res.status(200).json(false);
-})
+});
 
 app.get('/get-user-email', (req, res)=>{
 
