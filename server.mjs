@@ -10,6 +10,7 @@ import cors from 'cors';
 import bcrypt from 'bcrypt';
 import session from 'express-session';
 import nodemailer from 'nodemailer';
+import MongoStore from 'connect-mongo';
 
 
 import User from './model.mjs';
@@ -34,6 +35,9 @@ app.use(session({
     saveUninitialized: false,
     resave: false,
     proxy: true,
+    store: MongoStore.create({
+        mongoUri: process.env.MONGODB_CONNECT_STRING
+    }),
     cookie: {
         httpOnly: true,
         secure: true,    
