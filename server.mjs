@@ -24,6 +24,11 @@ const rounds = 10;
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(cors({
+    origin: "https://calhounbryce13.github.io",
+    methods: ['GET', 'POST'],
+    credentials: true
+}));
 app.use(session({
     secret: "something something darkside",
     saveUninitialized: false,
@@ -34,12 +39,7 @@ app.use(session({
         sameSite: 'None'
     }
 }));
-app.use(cors({
-    //! update for deployment
-    origin: "https://calhounbryce13.github.io",
-    methods: ['GET', 'POST'],
-    credentials: true
-}))
+
 
 /******************************** TRANSPORTER ********************************************************************/
 const transporter = nodemailer.createTransport({
