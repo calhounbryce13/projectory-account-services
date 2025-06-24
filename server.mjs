@@ -282,10 +282,9 @@ const session_start = function(req, res, email){
                 res.status(500).json({ error: "Session not saved" });
                 return;
             }
-            res.status(200).json({ message: "Login successful" });
+            res.status(200).send({message:"session start"});
             return;
         });
-        res.status(200).send({message:"session start"});
     }
     else{
         console.log(`${email},\nalready logged in!`);
