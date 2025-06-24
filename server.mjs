@@ -283,6 +283,7 @@ const session_start = function(req, res, email){
                 return;
             }
             res.status(200).json({ message: "Login successful" });
+            return;
         });
         res.status(200).send({message:"session start"});
     }
