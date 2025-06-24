@@ -36,7 +36,7 @@ app.use(session({
     resave: false,
     proxy: true,
     store: MongoStore.create({
-        mongoUri: process.env.MONGODB_CONNECT_STRING
+        mongoUrl: process.env.MONGODB_CONNECT_STRING
     }),
     cookie: {
         httpOnly: true,
