@@ -103,7 +103,7 @@ const get_my_projects = async(email, projectType)=>{
     else if(projectType == 'planned'){
         return user[0].planned;
     }
-    else if(projectType == 'completed'){
+    else if(projectType == 'complete'){
         return user[0].complete;
     }
 }
