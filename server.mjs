@@ -207,7 +207,6 @@ app.post('/logout', (req, res)=>{
 
 app.post('/login', async(req, res)=>{
     console.log("\nlogin endpoint hit\n");
-    console.log(req.body);
     const userEmail = req.body['userEmail'];
     const plainTextPassword = req.body['userPassword'];
     if(userEmail && plainTextPassword){
