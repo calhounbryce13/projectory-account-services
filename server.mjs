@@ -63,6 +63,10 @@ const transporter = nodemailer.createTransport({
 /******************************** ROUTE HANDLERS ********************************************************************/
 
 
+app.get('/server-status', (req, res) => {
+    res.status(200).json({"status":"OK"});
+});
+
 app.get('/login-status', (req, res)=>{
     if(req.session){
         console.log("\nrequest session data:",req.session)
