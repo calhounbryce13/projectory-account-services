@@ -265,6 +265,21 @@ app.post('/registration', async(req, res)=>{
     res.status(400).send({message: "error no request body"});
 });
 
+app.get('/get-amounts', async(req, res) => {
+    if(req.session){
+        if(req.session.user){
+            const data = await User.get_amounts(req.session.user);
+            if(data != null){
+                res.status(200).json(data);
+                return;
+            }
+            res.status(500).json({'error': 'issue communicating with database'});
+        }
+    }
+    res.status(400).json({'error': 'invalid session'});
+    return;
+})
+
 
 
 

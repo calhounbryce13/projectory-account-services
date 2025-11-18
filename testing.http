@@ -61,6 +61,10 @@ Cookie: connect.sid=s%3Am7B3AG3Qmt4H41DaHub-Iw_soL9ZNyqo.pfq9aHoAKs9P%2FtmQHKdSB
 
 
 ###
-
 GET http://127.0.0.1:3000/get-user-email
 Cookie: connect.sid=s%3AGFlI8yp2Ca4eOJPdADdfHj3kSgNM8plh.vKcYBgqblLh5tVD6E%2FAuOXg0x%2FYVCTRlld7mxOPoIfY; Path=/; HttpOnly
+
+###
+
+GET http://127.0.0.1:3000/get-amounts
+Cookie: 

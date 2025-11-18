@@ -119,10 +119,20 @@ const add_task_to_existing_project = async(user, task, index)=>{
     await myUser[0].save();
 }
 
+const get_amounts = async(name) => {
+    let user = await find_existing_user(name);
+    if(user.length > 0){
+        const amounts = [];
+        user = user[0];
+        amounts.push(user.planned.length);
+        amounts.push(user.current.length);
+        amounts.push(user.complete.length);
+        return amounts;
+    }
+    return null;
+}
 
-
-//add_task_to_existing_project('calhounbryce13@gmail.com', "blah blah blah", 2);
 
 ////////////////////////////////////////////////////////////////
 
-export default { create_new_user, find_existing_user, add_user_project, get_my_projects, add_task_to_existing_project }
+export default { create_new_user, find_existing_user, add_user_project, get_my_projects, add_task_to_existing_project, get_amounts }
