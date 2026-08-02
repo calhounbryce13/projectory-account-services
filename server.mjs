@@ -7,7 +7,7 @@ Description: Backend account services REST API/database controller for Projector
 
 import express from 'express';
 import cors from 'cors';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import session from 'express-session';
 import nodemailer from 'nodemailer';
 import MongoStore from 'connect-mongo';
@@ -24,10 +24,10 @@ const rounds = 10;
 /******************************** MIDDLEWARE ********************************************************************/
 app.set('trust proxy', 1); 
 app.use(express.json());
-app.use(express.urlencoded({extended: true}));
+//app.use(express.urlencoded({extended: true}));
 app.use(cors({
     origin: "https://calhounbryce13.github.io",
-    methods: ['GET', 'POST'],
+    methods: ['GET', 'POST', 'PUT'],
     credentials: true
 }));
 app.use(session({
@@ -59,9 +59,24 @@ const transporter = nodemailer.createTransport({
 })
 
 
-
 /******************************** ROUTE HANDLERS ********************************************************************/
 
+
+
+app.put('/update-password', async(req, res) => {
+    const user = req.body["user"];
+    const newPword = req.body["newPword"];
+
+    if(user && newPword){
+        const hashedPassword = await bcrypt.hash(newPword, 12);
+        const result = await User.update_password(user, hashedPassword);
+        res.sendStatus(200);
+        return;
+    }
+    res.status(400).json("error: invalid body");
+    return;
+
+});
 
 app.get('/server-status', (req, res) => {
     res.status(200).json({"status":"OK"});
@@ -115,7 +130,6 @@ app.post('/current-projects-generator', async(req, res)=>{
     const title = req.body['title'];
     const goal = req.body['goal'];
 
-
     const tasks = [];
     const tasklist = req.body['tasks'];
     for(let i = 0; i < tasklist.length; i++){
@@ -150,7 +164,6 @@ app.post('/current-projects-generator', async(req, res)=>{
 });
 
 app.post('/planned-projects-generator', async(req, res)=>{
-    console.log("\nplanned projects endpoint hit!\n");
     let validSession = validate_user_session(req);
     if(!validSession){
         res.status(400).json("invalid request session");
@@ -195,19 +208,19 @@ app.post('/subtask-generator', (req, res)=>{
 });
 
 app.post('/logout', (req, res)=>{
-    console.log("\nlogout endpoint hit\n");
-    try{
+    if(req.session){
         if(req.session.loggedIn){
             req.session.destroy();
-            console.log(req.session);
             res.status(200).json("logged out");
         }
         else{
             console.log("\nerroneous logout w/o login!");
         }
-    }catch(error){
-        console.log(error);
+        return;
     }
+    res.status(400).json("error: no valid session object");
+    return;
+
 });
 
 app.post('/login', async(req, res)=>{

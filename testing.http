@@ -8,8 +8,8 @@ POST http://127.0.0.1:3000/registration
 Content-Type: application/json
 
 {
-    "userEmail": "calhounbryce13@gmail.com",
-    "userPassword":"Jarvis123"
+    "userEmail": "",
+    "userPassword":""
 }
 
 ###
@@ -18,8 +18,8 @@ POST http://127.0.0.1:3000/login
 Content-Type: application/json
 
 {
-    "userEmail": "calhounbryce13@gmail.com",
-    "userPassword": "Jarvis123"
+    "userEmail": "",
+    "userPassword": ""
 }
 
 ###
@@ -47,8 +47,7 @@ Cookie: connect.sid=s%3Av9XQkh6vWukJJlKy4LrDOW9U7WTj1A4H.3ZwQRGSRajF3IfuCGglgchr
 
 POST http://127.0.0.1:3000/logout
 
-connect.sid=s%3AjVBJU2uRHXAE-TRa_05nfOrY38Rc_wnR.Rxj%2Fo%2Bd8HD%2F5cAeQfaUkiJ4GrU44wAdvgioVDu12ezU
-
+connect.sid=s%3API8acJX4Cy07o3VH88OQRDldmnG4wPMe.BuBcLFpyGHQpBo45ha13puTRl4%2BdhK0HRQa0EUENCJo
 ###
 
 POST http://127.0.0.1:3000/view-projects
@@ -68,3 +67,14 @@ Cookie: connect.sid=s%3AGFlI8yp2Ca4eOJPdADdfHj3kSgNM8plh.vKcYBgqblLh5tVD6E%2FAuO
 
 GET http://127.0.0.1:3000/get-amounts
 Cookie: 
+
+###
+
+
+PUT http://127.0.0.1:3000/update-password
+Content-Type: application/json
+
+{
+    "user": "",
+    "newPword": ""
+}

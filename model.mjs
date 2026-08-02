@@ -76,8 +76,13 @@ const add_user_project = async(email, project, num)=>{
 
 const find_existing_user = async(userEmail)=>{
     let filter = {email: userEmail};
-    let knownUsers = await User.find(filter);
-    return knownUsers;
+    try{
+        let knownUsers = await User.find(filter);
+        return knownUsers;
+    }catch(error){
+        console.log(error);
+    }
+    return false;
 }
 
 const delete_all_for_user = async(userEmail)=>{
@@ -132,7 +137,17 @@ const get_amounts = async(name) => {
     return null;
 }
 
+const update_password = async(user, newPword) => {
+    try{
+        await User.findOneAndUpdate({email: user}, {$set : {password: newPword}});
+        return true;
+    }catch(error){
+        console.log(error);
+    }
+    return false;
+};
+
 
 ////////////////////////////////////////////////////////////////
 
-export default { create_new_user, find_existing_user, add_user_project, get_my_projects, add_task_to_existing_project, get_amounts }
+export default { update_password, create_new_user, find_existing_user, add_user_project, get_my_projects, add_task_to_existing_project, get_amounts }
