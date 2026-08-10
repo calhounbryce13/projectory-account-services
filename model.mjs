@@ -147,7 +147,27 @@ const update_password = async(user, newPword) => {
     return false;
 };
 
+const duplicate_exists = async(user, questionableTitle, projectSection) => {
+    try{
+        const accounts = await User.find({email: user});
+        const userAccount = accounts[0];
+        if(!(userAccount.projectSection)) throw "invalid project section passsed to duplicate check";
+        Array.from(userAccount.projectSection);
+        for(let i = 0; i < (userAccount.projectSection).length; i++){
+            if((project.title).toLowerCase() == questionableTitle.toLowerCase()) return true;
+        }
+    }catch(e){
+        console.error(e);
+        return true;
+    }
+    return false;
+}
+
 
 ////////////////////////////////////////////////////////////////
 
-export default { update_password, create_new_user, find_existing_user, add_user_project, get_my_projects, add_task_to_existing_project, get_amounts }
+export default { 
+                update_password, create_new_user, find_existing_user, 
+                add_user_project, get_my_projects, add_task_to_existing_project, 
+                get_amounts, duplicate_exists
+                }

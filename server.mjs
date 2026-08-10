@@ -3,8 +3,6 @@ Author: Bryce Calhoun
 Description: Backend account services REST API/database controller for Projectory's frontend
 */
 
-
-
 import express from 'express';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
@@ -18,8 +16,6 @@ import User from './model.mjs';
 const app = express();
 const PORT = process.env.PORT || 3000;
 const rounds = 10;
-
-
 
 /******************************** MIDDLEWARE ********************************************************************/
 app.set('trust proxy', 1); 
@@ -60,8 +56,6 @@ const transporter = nodemailer.createTransport({
 
 
 /******************************** ROUTE HANDLERS ********************************************************************/
-
-
 
 app.put('/update-password', async(req, res) => {
     const user = req.body["user"];
@@ -122,44 +116,46 @@ app.post('/projects-view', async(req, res)=>{
 
 app.post('/current-projects-generator', async(req, res)=>{
     let validSession = validate_user_session(req);
-    if(!validSession){
-        res.status(400).json("invalid request session");
+    if(validSession){
+        const email = req.session.user;
+        const title = req.body['title'];
+        const goal = req.body['goal'];
+        if(!(User.duplicate_exists(email, title, "current"))){
+            const tasks = [];
+            const tasklist = req.body['tasks'];
+            for(let i = 0; i < tasklist.length; i++){
+                const task_description = tasklist[i]
+                let task = {
+                    task_description: task_description,
+                    due_date: null,
+                    is_complete: 0
+                }
+                tasks.push(task)
+            }
+            if((goal != "") && (title != "")){
+                const project = {
+                    title: title,
+                    goal: goal,
+                    tasks: tasks,
+                    is_complete: 0
+                };
+                try{
+                    await User.add_user_project(email, project, 0);
+                    res.status(201).json("current project added");
+                }catch(error){
+                    console.log(error);
+                    res.status(500).json({"Error": "server error creating the project"});
+                }
+                return;
+            }
+            res.status(400).json({"Error": "Incomplete body"});
+            return;
+        }
+        res.status(409).json({"Error": "duplicate exists in the same section"});
         return;
     }
-    const email = req.session.user;
-    const title = req.body['title'];
-    const goal = req.body['goal'];
-
-    const tasks = [];
-    const tasklist = req.body['tasks'];
-    for(let i = 0; i < tasklist.length; i++){
-        const task_description = tasklist[i]
-        let task = {
-            task_description: task_description,
-            due_date: null,
-            is_complete: 0
-        }
-        tasks.push(task)
-    }
-
-    if(!(goal == "") && !(title == "")){
-        const project = {
-            title: title,
-            goal: goal,
-            tasks: tasks,
-            is_complete: 0
-        };
-        try{
-            await User.add_user_project(email, project, 0);
-            res.status(200).json("current project added");
-        }catch(error){
-            console.log(error);
-            res.status(500).json("error");
-        }
-        return;
-    }
-    res.status(400).json({"Error": "Incomplete body"})
-
+    res.status(401).json({"Error": "invalid request session"});
+    return;
 
 });
 
@@ -294,8 +290,6 @@ app.get('/get-amounts', async(req, res) => {
 })
 
 
-
-
 /******************************** HELPER FUNCTIONS ********************************************************************/
 
 
@@ -307,7 +301,6 @@ const validate_user_session = function(req){
     }
     return false
 }
-
 
 const session_start = function(req, res, email){
     if(!(req.session.loggedIn)){
@@ -379,7 +372,6 @@ const send_confirmation_email = async(email)=>{
         return false;
     }
 }
-
 
 const setup_user_account = async(password, email, res)=>{
     let hashedPassword = await bcrypt.hash(password, rounds);
