@@ -20,7 +20,6 @@ const rounds = 10;
 /******************************** MIDDLEWARE ********************************************************************/
 app.set('trust proxy', 1); 
 app.use(express.json());
-//app.use(express.urlencoded({extended: true}));
 app.use(cors({
     origin: "https://calhounbryce13.github.io",
     methods: ['GET', 'POST', 'PUT'],
@@ -144,50 +143,49 @@ app.post('/current-projects-generator', async(req, res)=>{
                     res.status(201).json("current project added");
                 }catch(error){
                     console.log(error);
-                    res.status(500).json({"Error": "server error creating the project"});
+                    res.status(500).json({"Error": "Server error creating the project"});
                 }
                 return;
             }
             res.status(400).json({"Error": "Incomplete body"});
             return;
         }
-        res.status(409).json({"Error": "duplicate exists in the same section"});
+        res.status(409).json({"Error": "Duplicate exists in the same section"});
         return;
     }
-    res.status(401).json({"Error": "invalid request session"});
+    res.status(401).json({"Error": "Invalid request session"});
     return;
 
 });
 
 app.post('/planned-projects-generator', async(req, res)=>{
     let validSession = validate_user_session(req);
-    if(!validSession){
-        res.status(400).json("invalid request session");
-        return;
-    }
-    const email = req.session.user;
-    const title = req.body['title'];
-    const goal = req.body['goal'];
-    if(!(title == "") && !(goal == "")){
-
-        const project = {
-            title: title,
-            goal: goal
-        };
-        
-        try{
-            await User.add_user_project(email, project, 1);
-            res.status(200).json("planned project added");
-        }catch(error){
-            console.log(error);
-            res.status(500).json("could not add user planned project");
+    if(validSession){
+        const email = req.session.user;
+        const title = req.body['title'];
+        const goal = req.body['goal'];
+        if(!(User.duplicate_exists(email, title, "planned"))){
+            if((title != "") && (goal != "")){
+                const project = {
+                    title: title,
+                    goal: goal
+                };
+                try{
+                    await User.add_user_project(email, project, 1);
+                    res.status(200).json("planned project added");
+                }catch(e){
+                    console.error(e);
+                    res.status(500).json({"Error": "Issue adding the planned project"});
+                }
+                return;
+            }
+            res.status(400).json({"Error": "Missing title and/or goal"});
+            return;
         }
+        res.status(409).json({"Error": "Duplicate exists in the same section"})
     }
-    else{
-        res.status(400).json({"Error": "Incomplete body"})
-    }
-
-
+    res.status(401).json({"Error": "Invalid request session"});
+    return;
 });
 
 app.post('/subtask-generator', (req, res)=>{
@@ -354,41 +352,17 @@ const check_for_existing_email = async(userEmail)=>{
     return true;
 }
 
-const send_confirmation_email = async(email)=>{
-    const subject = 'Projectory account confirmation';
-    const introductoryWelcome = 'Welcome to Projectory!\nThis email is just to confirm your account registration for your records.';
-    const contactReference = '\nIf you have any questions, feel free to respond to this.';
-    const message = introductoryWelcome + contactReference;
-    try{
-        const sendEmail = await transporter.sendMail({
-            from:'calhounbryce13@gmail.com',
-            to: email,
-            subject: subject,
-            text: message
-        });
-        return true;
-    }catch(error){
-        console.log(error);
-        return false;
-    }
-}
-
 const setup_user_account = async(password, email, res)=>{
     let hashedPassword = await bcrypt.hash(password, rounds);
     let response;
     try{
         response = await User.create_new_user(email, hashedPassword, rounds);
-        const emailSent = await send_confirmation_email(email);
-        if(emailSent){
-            res.status(200).json({"message":"true"});
-            return;
-        }
-        res.status(200).json("account made successfully but error sending confirm email");
+        res.sendStatus(201);
         console.log("\nnew user created", email);
         return;
     }catch(error){
-        console.log(error);
-        res.status(500).send({message:"error trying to create a new user"});
+        console.error(error);
+        res.status(500).send({"Error":"Issue trying to create a new user"});
         return;
     }
 }
