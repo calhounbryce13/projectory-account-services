@@ -1,9 +1,8 @@
-
-
 ###
 GET http://127.0.0.1:3000/server-status
-###
 
+
+###
 POST http://127.0.0.1:3000/registration
 Content-Type: application/json
 
@@ -12,8 +11,8 @@ Content-Type: application/json
     "userPassword":""
 }
 
-###
 
+###
 POST http://127.0.0.1:3000/login
 Content-Type: application/json
 
@@ -22,16 +21,14 @@ Content-Type: application/json
     "userPassword": ""
 }
 
+
 ###
-
-
 POST http://127.0.0.1:3000/current-projects
 
 connect.sid=s%3AbwW9whTpWMWf22RtH2yxh4DI-x2QxUk6.9xgy5JmpG0JYU4rF%2BUFbNtnHFr5sF3th4SoeDJw7Cb8
 
 
 ###
-
 POST http://127.0.0.1:3000/current-projects-generator
 Content-Type: application/json
 Cookie: connect.sid=s%3Av9XQkh6vWukJJlKy4LrDOW9U7WTj1A4H.3ZwQRGSRajF3IfuCGglgchrDZ4DqvZpH%2FHDaW5JSKpU
@@ -42,14 +39,14 @@ Cookie: connect.sid=s%3Av9XQkh6vWukJJlKy4LrDOW9U7WTj1A4H.3ZwQRGSRajF3IfuCGglgchr
     "tasks": ["step 1", "step 2", "step 3", "step 4"]
 }
 
+
 ###
-
-
 POST http://127.0.0.1:3000/logout
 
 connect.sid=s%3API8acJX4Cy07o3VH88OQRDldmnG4wPMe.BuBcLFpyGHQpBo45ha13puTRl4%2BdhK0HRQa0EUENCJo
-###
 
+
+###
 POST http://127.0.0.1:3000/view-projects
 Content-Type: application/json
 Cookie: connect.sid=s%3Am7B3AG3Qmt4H41DaHub-Iw_soL9ZNyqo.pfq9aHoAKs9P%2FtmQHKdSB4gHGALgzO7usQHlYEtE5oY
@@ -63,14 +60,13 @@ Cookie: connect.sid=s%3Am7B3AG3Qmt4H41DaHub-Iw_soL9ZNyqo.pfq9aHoAKs9P%2FtmQHKdSB
 GET http://127.0.0.1:3000/get-user-email
 Cookie: connect.sid=s%3AGFlI8yp2Ca4eOJPdADdfHj3kSgNM8plh.vKcYBgqblLh5tVD6E%2FAuOXg0x%2FYVCTRlld7mxOPoIfY; Path=/; HttpOnly
 
-###
 
+###
 GET http://127.0.0.1:3000/get-amounts
 Cookie: 
 
+
 ###
-
-
 PUT http://127.0.0.1:3000/update-password
 Content-Type: application/json
 

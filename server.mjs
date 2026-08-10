@@ -9,8 +9,6 @@ import bcrypt from 'bcryptjs';
 import session from 'express-session';
 import nodemailer from 'nodemailer';
 import MongoStore from 'connect-mongo';
-
-
 import User from './model.mjs';
 
 const app = express();
@@ -40,18 +38,6 @@ app.use(session({
         sameSite: 'none'
     }
 }));
-
-
-/******************************** TRANSPORTER ********************************************************************/
-const transporter = nodemailer.createTransport({
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
-    auth:{
-        user: "calhounbryce13@gmail.com",
-        pass: process.env.EMAIL_PASSWORD
-    }
-})
 
 
 /******************************** ROUTE HANDLERS ********************************************************************/
