@@ -10,6 +10,8 @@ import session from 'express-session';
 import nodemailer from 'nodemailer';
 import MongoStore from 'connect-mongo';
 import User from './model.mjs';
+import ERRORS from './utils.mjs';
+
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -34,7 +36,7 @@ app.use(session({
     cookie: {
         httpOnly: true,
         secure: true,
-        maxAge: 1000 * 60 * 60 * 24 * 7,    
+        maxAge: 1000 * 60 * 60 * 24 * 1,    
         sameSite: 'none'
     }
 }));
@@ -204,31 +206,26 @@ app.post('/logout', (req, res)=>{
 });
 
 app.post('/login', async(req, res)=>{
-    console.log("\nlogin endpoint hit\n");
     const userEmail = req.body['userEmail'];
     const plainTextPassword = req.body['userPassword'];
     if(userEmail && plainTextPassword){
         let alreadyHasAccount = await check_for_existing_email(userEmail);
-        console.log(alreadyHasAccount);
-        if(alreadyHasAccount == true){
+        if(alreadyHasAccount){
             let validPassword = await validate_user_password(plainTextPassword, userEmail);
             if(validPassword){
                 session_start(req, res, userEmail);
+                return;
             }
-            else{
-                res.status(200).send({message:"invalid username and/or password (password)"});
-            }
-            return;
-        }
-        else if(alreadyHasAccount == false){
-            res.status(200).send({message: "invalid username and/or password"});
+            res.status(401).json({"Error":"invalid password"});
             return;
         }
         else{
+            res.status(401).json({"Error": "invalid username and/or password"});
             return;
         }
+        return;
     }
-    res.status(400).send({message: "error missing email and/or password"});
+    res.status(400).json({"Error": "error missing email and/or password"});
     return;
 
 });
@@ -287,23 +284,16 @@ const validate_user_session = function(req){
 }
 
 const session_start = function(req, res, email){
-    if(!(req.session.loggedIn)){
-        req.session.loggedIn = true;
-        req.session.user = email;
-        req.session.save(err => {
-            if(err){
-                res.status(500).json({ error: "Session not saved" });
-                return;
-            }
-            res.status(200).send({message:"session start"});
+    req.session.loggedIn = true;
+    req.session.user = email;
+    req.session.save(err => {
+        if(err){
+            res.status(500).json({ "Error": "Session not saved" });
             return;
-        });
-    }
-    else{
-        console.log(`${email},\nalready logged in!`);
-        res.status(200).json("user already logged in");
-    }
-    return;
+        }
+        res.status(200).json({"message":"session start"});
+        return;
+    });
 }
 
 const validate_user_password = async(plainTextPassword, userEmail)=>{
