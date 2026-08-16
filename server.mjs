@@ -7,7 +7,6 @@ import express from 'express';
 import cors from 'cors';
 import bcrypt from 'bcryptjs';
 import session from 'express-session';
-import nodemailer from 'nodemailer';
 import MongoStore from 'connect-mongo';
 import User from './model.mjs';
 import ERRORS from './utils.mjs';
@@ -47,7 +46,6 @@ app.use(session({
 app.put('/update-password', async(req, res) => {
     const user = req.body["user"];
     const newPword = req.body["newPword"];
-
     if(user && newPword){
         const hashedPassword = await bcrypt.hash(newPword, 12);
         const result = await User.update_password(user, hashedPassword);
@@ -82,6 +80,10 @@ app.get('/get-user-email', (req, res)=>{
         res.status(500).json('null');
     }
 });
+
+
+
+
 
 app.post('/projects-view', async(req, res)=>{
     console.log("\nprojects view endpoint hit!\n");
@@ -189,6 +191,25 @@ app.post('/subtask-generator', (req, res)=>{
     res.status(400).json({"error": "bad request"});
 });
 
+app.get('/get-amounts', async(req, res) => {
+    if(req.session){
+        if(req.session.user){
+            const data = await User.get_amounts(req.session.user);
+            if(data != null){
+                res.status(200).json(data);
+                return;
+            }
+            res.status(500).json({'error': 'issue communicating with database'});
+        }
+    }
+    res.status(400).json({'error': 'invalid session'});
+    return;
+});
+
+
+
+
+
 app.post('/logout', (req, res)=>{
     if(req.session){
         if(req.session.loggedIn){
@@ -254,22 +275,6 @@ app.post('/registration', async(req, res)=>{
     }
     res.status(400).send({message: "error no request body"});
 });
-
-app.get('/get-amounts', async(req, res) => {
-    if(req.session){
-        if(req.session.user){
-            const data = await User.get_amounts(req.session.user);
-            if(data != null){
-                res.status(200).json(data);
-                return;
-            }
-            res.status(500).json({'error': 'issue communicating with database'});
-        }
-    }
-    res.status(400).json({'error': 'invalid session'});
-    return;
-})
-
 
 /******************************** HELPER FUNCTIONS ********************************************************************/
 
