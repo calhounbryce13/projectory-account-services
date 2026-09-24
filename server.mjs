@@ -207,9 +207,6 @@ app.get('/get-amounts', async(req, res) => {
 });
 
 
-
-
-
 app.post('/logout', (req, res)=>{
     if(req.session){
         if(req.session.loggedIn){
@@ -230,25 +227,25 @@ app.post('/login', async(req, res)=>{
     const userEmail = req.body['userEmail'];
     const plainTextPassword = req.body['userPassword'];
     if(userEmail && plainTextPassword){
-        let alreadyHasAccount = await check_for_existing_email(userEmail);
-        if(alreadyHasAccount){
-            let validPassword = await validate_user_password(plainTextPassword, userEmail);
-            if(validPassword){
-                session_start(req, res, userEmail);
+        let existingAccount = await check_for_existing_email(userEmail);
+        if(existingAccount){
+            if(!(existingAccount == "empty")){
+                let validPassword = await validate_user_password(plainTextPassword, userEmail, existingAccount);
+                if(validPassword){
+                    session_start(req, res, userEmail);
+                    return;
+                }
+                res.status(401).json({"Error":"invalid password"});
                 return;
             }
-            res.status(401).json({"Error":"invalid password"});
+            res.sendStatus(402);
             return;
         }
-        else{
-            res.status(401).json({"Error": "invalid username and/or password"});
-            return;
-        }
+        res.sendStatus(500);
         return;
     }
-    res.status(400).json({"Error": "error missing email and/or password"});
+    res.status(400).json({"Error": "missing email and/or password"});
     return;
-
 });
 
 app.post('/registration', async(req, res)=>{
@@ -276,6 +273,7 @@ app.post('/registration', async(req, res)=>{
     res.status(400).send({message: "error no request body"});
 });
 
+
 /******************************** HELPER FUNCTIONS ********************************************************************/
 
 
@@ -301,36 +299,24 @@ const session_start = function(req, res, email){
     });
 }
 
-const validate_user_password = async(plainTextPassword, userEmail)=>{
-    let userAccount = await User.find_existing_user(userEmail);
-    const hashedPassword = userAccount[0].password;
-
-    let valid;
+const validate_user_password = async(plainTextPassword, userEmail, existingAccount)=>{
+    const hashedPassword = existingAccount[0].password;
     try{
-        valid = await bcrypt.compare(plainTextPassword, hashedPassword);
+        let valid = await bcrypt.compare(plainTextPassword, hashedPassword);
+        if(valid) return true;
     }catch(error){
         console.log(error);
-        return null;
-    }
-    if(valid){
-        return true;
     }
     return false;
 }
 
 const check_for_existing_email = async(userEmail)=>{
-    let accounts;
-    try{
-        accounts = await User.find_existing_user(userEmail);
-    }catch(error){
-        console.log(error);
-        res.status(500).send({message: "could not verify user credentials!"});
-        return null;
+    let accounts = await User.find_existing_user(userEmail);
+    if(accounts){
+        let response = (accounts.length) ? "empty" : accounts;
+        return response;
     }
-    if(accounts.length == 0){
-        return false;
-    }
-    return true;
+    return false;
 }
 
 const setup_user_account = async(password, email, res)=>{
