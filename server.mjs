@@ -235,12 +235,15 @@ app.post('/login', async(req, res)=>{
                     session_start(req, res, userEmail);
                     return;
                 }
+                console.error("INVALID PASSWORD LOGIN ERROR");
                 res.status(401).json({"Error":"invalid password"});
                 return;
             }
+            console.error("NON-EXISTING USER LOGIN ERROR")
             res.sendStatus(402);
             return;
         }
+        console.error("DBMS LOGIN ERROR");
         res.sendStatus(500);
         return;
     }
