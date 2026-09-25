@@ -210,17 +210,23 @@ app.get('/get-amounts', async(req, res) => {
 app.post('/logout', (req, res)=>{
     if(req.session){
         if(req.session.loggedIn){
-            req.session.destroy();
-            res.status(200).json("logged out");
+            req.session.destroy((error) => {
+                if(error){
+                    console.error("DBMS LOGOUT ERROR");
+                    res.sendStatus(500);
+                    return;
+                }
+            });
+            res.sendStatus(200);
+            return;
         }
-        else{
-            console.log("\nerroneous logout w/o login!");
-        }
+        console.error("NO ACTIVE LOGIN ON LOGOUT ERROR");
+        res.sendStatus(400);
         return;
     }
-    res.status(400).json("error: no valid session object");
+    console.error("NO SESSION ON LOGOUT ERROR");
+    res.sendStatus(401);
     return;
-
 });
 
 app.post('/login', async(req, res)=>{
