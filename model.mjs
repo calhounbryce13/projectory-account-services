@@ -57,7 +57,13 @@ let User = mongoose.model('User', userSchema, 'user-data');
 
 const create_new_user = async(email, password, passKey)=>{
     const newAccount = new User({email: email, password:password, passKey:passKey, current: [], planned: [], complete:[]});
-    return await newAccount.save();
+    try{
+        await newAccount.save();
+        return true;
+    }catch(error){
+        console.error(error);
+        return false;
+    }
 }
 
 const add_user_project = async(email, project, num)=>{
@@ -74,29 +80,19 @@ const add_user_project = async(email, project, num)=>{
     await user[0].save();
 }
 
-const find_existing_user = async(userEmail)=>{
+const check_existing_user = async(userEmail, find)=>{
     let filter = {email: userEmail};
     try{
-        let knownUsers = await User.find(filter);
-        return knownUsers;
+        let knownUsers = Array.from(await User.find(filter));
+        if(knownUsers.length != 0){
+            if(find) return knownUsers;
+            return 2;
+        }
     }catch(error){
-        console.log(error);
+        console.error(error);
+        return 0;
     }
-    return false;
-}
-
-const delete_all_for_user = async(userEmail)=>{
-    let filter = {email: userEmail};
-    let res = await User.deleteMany(filter);
-    console.log(res.deletedCount);
-    return res;
-}
-
-const delete_user = async(userEmail)=>{
-    let filter = {email: userEmail};
-    let res = await User.deleteOne(filter);
-    console.log(res.deletedCount);
-    return res;
+    return 1;
 }
 
 const get_my_projects = async(email, projectType)=>{
@@ -167,7 +163,7 @@ const duplicate_exists = async(user, questionableTitle, projectSection) => {
 ////////////////////////////////////////////////////////////////
 
 export default { 
-                update_password, create_new_user, find_existing_user, 
+                update_password, create_new_user, check_existing_user, 
                 add_user_project, get_my_projects, add_task_to_existing_project, 
                 get_amounts, duplicate_exists
                 }

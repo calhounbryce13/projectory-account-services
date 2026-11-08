@@ -206,7 +206,6 @@ app.get('/get-amounts', async(req, res) => {
     return;
 });
 
-
 app.post('/logout', (req, res)=>{
     if(req.session){
         if(req.session.loggedIn){
@@ -230,30 +229,34 @@ app.post('/logout', (req, res)=>{
 });
 
 app.post('/login', async(req, res)=>{
-    const userEmail = req.body['userEmail'];
-    const plainTextPassword = req.body['userPassword'];
-    if(userEmail && plainTextPassword){
-        let existingAccount = await check_for_existing_email(userEmail);
-        if(existingAccount){
-            if(!(existingAccount == "empty")){
-                let validPassword = await validate_user_password(plainTextPassword, userEmail, existingAccount);
-                if(validPassword){
-                    session_start(req, res, userEmail);
+    if(req.body){
+        const userEmail = req.body['userEmail'];
+        const plainTextPassword = req.body['userPassword'];
+        if(userEmail && plainTextPassword){
+            let response = await User.check_existing_user(userEmail, true);
+            if(response){
+                if(response != 1){
+                    let validPassword = await validate_user_password(plainTextPassword, response);
+                    if(validPassword){
+                        session_start(req, res, userEmail);
+                        return;
+                    }
+                    console.error("INVALID PASSWORD LOGIN ERROR");
+                    res.sendStatus(401);
                     return;
                 }
-                console.error("INVALID PASSWORD LOGIN ERROR");
-                res.status(401).json({"Error":"invalid password"});
+                console.error("NON-EXISTING USER LOGIN ERROR");
+                res.sendStatus(402);
                 return;
             }
-            console.error("NON-EXISTING USER LOGIN ERROR")
-            res.sendStatus(402);
+            console.error("DBMS LOGIN ERROR");
+            res.sendStatus(500);
             return;
         }
-        console.error("DBMS LOGIN ERROR");
-        res.sendStatus(500);
+        res.sendStatus(400);
         return;
     }
-    res.status(400).json({"Error": "missing email and/or password"});
+    res.sendStatus(400);
     return;
 });
 
@@ -262,24 +265,23 @@ app.post('/registration', async(req, res)=>{
         const email = req.body['userEmail'];
         const password = req.body['userPassword'];
         if(email && password){
-            let alreadyHasAccount = await check_for_existing_email(email);
-            if(alreadyHasAccount == false){
-                setup_user_account(password, email, res);
+            let response = await User.check_existing_user(email, false);
+            if(response){
+                if(response == 1){
+                    setup_user_account(password, email, res);
+                    return;
+                }
+                res.sendStatus(401);
                 return;
             }
-            else if(alreadyHasAccount == true){
-                res.status(200).json({message:"already has an account"});
-                return;
-            }
-            else{
-                res.status(500).send({message:"server error"});
-            }
+            res.sendStatus(500);
             return;
         }
-        res.status(400).send({message: "error missing email and/or password"});
+        res.sendStatus(400);
         return;
     }
-    res.status(400).send({message: "error no request body"});
+    res.sendStatus(400);
+    return;
 });
 
 
@@ -308,7 +310,7 @@ const session_start = function(req, res, email){
     });
 }
 
-const validate_user_password = async(plainTextPassword, userEmail, existingAccount)=>{
+const validate_user_password = async(plainTextPassword, existingAccount)=>{
     const hashedPassword = existingAccount[0].password;
     try{
         let valid = await bcrypt.compare(plainTextPassword, hashedPassword);
@@ -319,28 +321,17 @@ const validate_user_password = async(plainTextPassword, userEmail, existingAccou
     return false;
 }
 
-const check_for_existing_email = async(userEmail)=>{
-    let accounts = await User.find_existing_user(userEmail);
-    if(accounts){
-        let response = (accounts.length) ? "empty" : accounts;
-        return response;
-    }
-    return false;
-}
-
 const setup_user_account = async(password, email, res)=>{
     let hashedPassword = await bcrypt.hash(password, rounds);
-    let response;
-    try{
-        response = await User.create_new_user(email, hashedPassword, rounds);
+    const response = await User.create_new_user(email, hashedPassword, rounds);
+    if(response){
         res.sendStatus(201);
-        console.log("\nnew user created", email);
-        return;
-    }catch(error){
-        console.error(error);
-        res.status(500).send({"Error":"Issue trying to create a new user"});
+        console.log("\nNEW USER CREATED:", email);
         return;
     }
+    console.error(error);
+    res.sendStatus(500);
+    return;
 }
 
 /****************************************************************************************************/
