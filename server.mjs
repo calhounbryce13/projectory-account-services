@@ -329,7 +329,6 @@ const setup_user_account = async(password, email, res)=>{
         console.log("\nNEW USER CREATED:", email);
         return;
     }
-    console.error(error);
     res.sendStatus(500);
     return;
 }
