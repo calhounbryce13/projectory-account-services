@@ -232,12 +232,15 @@ app.post('/login', async(req, res)=>{
     if(req.body){
         const userEmail = req.body['userEmail'];
         const plainTextPassword = req.body['userPassword'];
+        console.log("LOGIN REQUEST RECIEVED:", userEmail);
         if(userEmail && plainTextPassword){
             let response = await User.check_existing_user(userEmail, true);
             if(response){
                 if(response != 1){
+                    console.log("EXISTING USER CHECK SUCCESS", response);
                     let validPassword = await validate_user_password(plainTextPassword, response);
                     if(validPassword){
+                        console.log("PASSWORD VALIDATION CHECK SUCCESS");
                         session_start(req, res, userEmail);
                         return;
                     }
@@ -262,6 +265,7 @@ app.post('/login', async(req, res)=>{
 
 app.post('/registration', async(req, res)=>{
     if(req.body){
+        console.log("REGISTRATION REQUEST RECIEVED");
         const email = req.body['userEmail'];
         const password = req.body['userPassword'];
         if(email && password){
@@ -302,10 +306,11 @@ const session_start = function(req, res, email){
     req.session.user = email;
     req.session.save(err => {
         if(err){
-            res.status(500).json({ "Error": "Session not saved" });
+            res.sendStatus(500);
             return;
         }
-        res.status(200).json({"message":"session start"});
+        console.log("STARTING SESSION & RESPONDING STATUS CODE 200 TO THE CLIENT");
+        res.sendStatus(200);
         return;
     });
 }

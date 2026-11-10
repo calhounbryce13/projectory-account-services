@@ -81,10 +81,12 @@ const add_user_project = async(email, project, num)=>{
 }
 
 const check_existing_user = async(userEmail, find)=>{
+    console.log("CHECKING FOR EXISTING USER", userEmail);
     let filter = {email: userEmail};
     try{
         let knownUsers = Array.from(await User.find(filter));
         if(knownUsers.length != 0){
+            console.log("RESPONDING TO CONTROLLER W/ USER INFO", knownUsers);
             if(find) return knownUsers;
             return 2;
         }
