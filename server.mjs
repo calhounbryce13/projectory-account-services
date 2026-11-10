@@ -62,9 +62,11 @@ app.get('/server-status', (req, res) => {
 });
 
 app.get('/login-status', (req, res)=>{
+    console.log('LOGIN STATUS REQUEST RECIEVED');
     if(req.session){
-        console.log("\nrequest session data:",req.session)
+        console.log("\nrequest session data:",req.session);
         if(req.session.loggedIn){
+            console.log("USER LOGIN IS CONFIRMED");
             res.status(200).json(true);
             return;
         }
@@ -237,7 +239,7 @@ app.post('/login', async(req, res)=>{
             let response = await User.check_existing_user(userEmail, true);
             if(response){
                 if(response != 1){
-                    console.log("EXISTING USER CHECK SUCCESS", response);
+                    console.log("EXISTING USER CHECK SUCCESS");
                     let validPassword = await validate_user_password(plainTextPassword, response);
                     if(validPassword){
                         console.log("PASSWORD VALIDATION CHECK SUCCESS");
