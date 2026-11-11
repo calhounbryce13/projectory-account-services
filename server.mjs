@@ -62,7 +62,7 @@ app.get('/server-status', (req, res) => {
 });
 
 app.get('/login-status', (req, res)=>{
-    console.log('LOGIN STATUS REQUEST RECIEVED');
+    console.log('LOGIN STATUS REQUEST RECIEVED, req object:', req);
     if(req.session){
         console.log("\nrequest session data:",req.session);
         if(req.session.loggedIn){
@@ -89,7 +89,6 @@ app.get('/get-user-email', (req, res)=>{
 
 app.post('/projects-view', async(req, res)=>{
     console.log("\nprojects view endpoint hit!\n");
-    console.log(req.session);
     let validSession = validate_user_session(req);
     if(!validSession){
         res.status(400).json("invalid request session");
